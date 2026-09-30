@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#ff8a3d">
+    <title>Blopity Blog</title>
+
+    <style>
+        :root {
+            --accent: #ff8a3d;
+            --accent-hover: #ed7629;
+            --accent-soft: #fff0e5;
+            --bg: #f7f7f5;
+            --surface: #fff;
+            --border: #e8e8e6;
+            --text: #252525;
+            --muted: #777;
+            --radius: 12px;
+            font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        button,
+        input,
+        textarea {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            height: 62px;
+            padding: 0 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 19px;
+            font-weight: 800;
+            letter-spacing: -.6px;
+        }
+
+        .brand-mark {
+            width: 30px;
+            height: 30px;
+            display: grid;
+            place-items: center;
+            border-radius: 10px;
+            background: var(--accent);
+            color: white;
+        }
+
+        .app-name {
+            padding-left: 12px;
+            border-left: 1px solid var(--border);
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn {
+            min-height: 36px;
+            padding: 0 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: white;
+            color: var(--text);
+            font-weight: 600;
+            transition: background .15s, transform .15s;
+        }
+
+        .btn:hover {
+            background: #f5f5f5;
+        }
+
+        .btn:active {
+            transform: scale(.97);
+        }
+
+        .btn-primary {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            border-color: var(--accent-hover);
+            background: var(--accent-hover);
+        }
+
+        .btn-ghost {
+            border-color: transparent;
+            background: transparent;
+        }
+
+        .layout {
+            display: flex;
+            min-height: calc(100vh - 62px);
+        }
+
+        .sidebar {
+            width: 220px;
+            flex-shrink: 0;
+            padding: 20px 12px;
+            background: white;
+            border-right: 1px solid var(--border);
+        }
+
+        .sidebar-heading {
+            padding: 8px 12px;
+            color: #999;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .8px;
+            text-transform: uppercase;
+        }
+
+        .nav-item {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 10px 12px;
+            margin-bottom: 3px;
+            border: 0;
+            border-radius: 8px;
+            background: transparent;
+            color: var(--muted);
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: #f5f5f5;
+            color: var(--text);
+        }
+
+        .nav-item.active {
+            background: var(--accent-soft);
+            color: var(--accent-hover);
+            font-weight: 700;
+        }
+
+        .main {
+            flex: 1;
+            min-width: 0;
+            padding: 32px;
+        }
+
+        .content {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .page-heading {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            margin: 0;
+            font-size: 27px;
+            letter-spacing: -.8px;
+        }
+
+        .page-description {
+            margin: 7px 0 0;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .search {
+            width: 100%;
+            height: 42px;
+            padding: 0 13px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            outline: none;
+            background: white;
+        }
+
+        .search:focus,
+        .field:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px #ff8a3d20;
+        }
+
+        .post-list {
+            display: grid;
+            gap: 14px;
+        }
+
+        .post-card {
+            padding: 22px;
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            background: white;
+            transition: box-shadow .15s, transform .15s;
+        }
+
+        .post-card:hover {
+            box-shadow: 0 5px 18px #0000000a;
+            transform: translateY(-2px);
+        }
+
+        .post-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .post-title {
+            margin: 10px 0 8px;
+            font-size: 21px;
+            letter-spacing: -.4px;
+        }
+
+        .post-excerpt {
+            margin: 0;
+            color: #666;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 20px;
+            background: var(--accent-soft);
+            color: var(--accent-hover);
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .editor,
+        .article {
+            padding: 24px;
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            background: white;
+        }
+
+        .field-group {
+            margin-bottom: 17px;
+        }
+
+        .field-group label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 13px;
+            font-weight: 650;
+        }
+
+        .field {
+            width: 100%;
+            min-height: 42px;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            outline: none;
+            background: white;
+            color: var(--text);
+        }
+
+        textarea.field {
+            min-height: 280px;
+            resize: vertical;
+            line-height: 1.65;
+        }
+
+        .editor-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+            margin-top: 20px;
+        }
+
+        .article-title {
+            margin: 12px 0;
+            font-size: clamp(28px, 5vw, 42px);
+            letter-spacing: -1.2px;
+            line-height: 1.15;
+        }
+
+        .article-body {
+            margin-top: 28px;
+            font-size: 16px;
+            line-height: 1.85;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .article-excerpt {
+            color: var(--muted);
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        .empty {
+            padding: 45px 20px;
+            text-align: center;
+            color: var(--muted);
+            background: white;
+            border: 1px dashed var(--border);
+            border-radius: 14px;
+        }
+
+        .status {
+            margin: 12px 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .status.error {
+            color: #b42318;
+        }
+
+        .status.success {
+            color: #23834c;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 760px) {
+            .layout {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                display: flex;
+                gap: 4px;
+                padding: 8px 12px;
+                overflow-x: auto;
+                border-right: 0;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .sidebar-heading {
+                display: none;
+            }
+
+            .nav-item {
+                width: auto;
+                flex-shrink: 0;
+                white-space: nowrap;
+                margin: 0;
+            }
+
+            .main {
+                padding: 24px 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .topbar {
+                padding: 0 14px;
+            }
+
+            .app-name {
+                display: none;
+            }
+
+            .page-heading {
+                flex-direction: column;
+            }
+
+            .page-title {
+                font-size: 24px;
+            }
+
+            .post-card,
+            .editor,
+            .article {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="topbar">
+        <a class="brand" href="#" id="home-link">
+            <span class="brand-mark">B</span>
+            <span>Blopity</span>
+            <span class="app-name">Blog</span>
+        </a>
+
+        <div class="header-actions">
+            <span id="user-label" class="muted"></span>
+            <button class="btn" id="auth-button">Sign in</button>
+        </div>
+    </header>
+
+    <div class="layout">
+
+        <aside class="sidebar">
+            <div class="sidebar-heading">Explore</div>
+            <button class="nav-item active" data-view="feed">⌂ &nbsp; Discover</button>
+            <button class="nav-item" data-view="my-posts">▤ &nbsp; My posts</button>
+            <button class="nav-item" data-view="saved">☆ &nbsp; Saved posts</button>
+            <button class="nav-item" data-view="write">＋ &nbsp; Write</button>
+        </aside>
+
+        <main class="main">
+            <div class="content">
+
+                <div id="status" class="status" role="status"></div>
+
+                <section id="feed-view">
+                    <div class="page-heading">
+                        <div>
+                            <h1 class="page-title">Discover</h1>
+                            <p class="page-description">
+                                Ideas, stories, and perspectives from the community.
+                            </p>
+                        </div>
+                        <button class="btn btn-primary" id="write-button">＋ Write a post</button>
+                    </div>
+
+                    <input class="search" id="search-input" placeholder="Search articles, authors, or tags...">
+
+                    <div id="feed-list" class="post-list"></div>
+                </section>
+
+                <section id="my-posts-view" class="hidden">
+                    <div class="page-heading">
+                        <div>
+                            <h1 class="page-title">My posts</h1>
+                            <p class="page-description">Your published articles and drafts.</p>
+                        </div>
+                        <button class="btn btn-primary" id="new-post-button">＋ New post</button>
+                    </div>
+                    <div id="my-post-list" class="post-list"></div>
+                </section>
+
+                <section id="saved-view" class="hidden">
+                    <div class="page-heading">
+                        <div>
+                            <h1 class="page-title">Saved posts</h1>
+                            <p class="page-description">Articles you've bookmarked.</p>
+                        </div>
+                    </div>
+                    <div id="saved-list" class="post-list"></div>
+                </section>
+
+                <section id="write-view" class="hidden">
+                    <div class="page-heading">
+                        <div>
+                            <h1 class="page-title" id="editor-heading">Write a post</h1>
+                            <p class="page-description">Create something worth sharing.</p>
+                        </div>
+                    </div>
+
+                    <form class="editor" id="editor-form">
+                        <div class="field-group">
+                            <label for="post-title">Title</label>
+                            <input class="field" id="post-title" maxlength="150" placeholder="Give your article a title"
+                                required>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="post-excerpt">Short description</label>
+                            <textarea class="field" id="post-excerpt" maxlength="400" rows="3"
+                                placeholder="What is your article about?"></textarea>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="post-tags">Tags</label>
+                            <input class="field" id="post-tags" placeholder="technology, science, ideas">
+                        </div>
+
+                        <div class="field-group">
+                            <label for="post-body">Article</label>
+                            <textarea class="field" id="post-body" placeholder="Start writing..." required></textarea>
+                        </div>
+
+                        <div class="editor-actions">
+                            <button class="btn btn-primary" type="submit" id="publish-button">Publish</button>
+                            <button class="btn" type="button" id="draft-button">
+                                Save draft
+                            </button>
+                            <button class="btn" type="button" id="cancel-button">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <section id="article-view" class="hidden">
+                    <button class="btn btn-ghost" id="back-button">← Back</button>
+                    <article class="article" id="article-content"></article>
+                </section>
+
+                <section id="auth-view" class="hidden">
+                    <div class="page-heading">
+                        <div>
+                            <h1 class="page-title" id="auth-heading">Welcome back</h1>
+                            <p class="page-description">Sign in or create your account.</p>
+                        </div>
+                    </div>
+
+                    <form class="editor" id="auth-form">
+                        <div class="field-group" id="name-group">
+                            <label for="display-name">Display name</label>
+                            <input class="field" id="display-name" maxlength="40" autocomplete="name">
+                        </div>
+
+                        <div class="field-group">
+                            <label for="email">Email</label>
+                            <input class="field" id="email" type="email" autocomplete="email" required>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="password">Password</label>
+                            <input class="field" id="password" type="password" minlength="6"
+                                autocomplete="current-password" required>
+                        </div>
+
+                        <div class="editor-actions">
+                            <button class="btn btn-primary" type="submit" id="auth-submit">
+                                Sign in
+                            </button>
+                            <button class="btn" type="button" id="toggle-auth">
+                                Create account
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from
+            "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+
+        import {
+            getAuth,
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword,
+            signOut,
+            onAuthStateChanged,
+            updateProfile
+        } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+
+        import {
+            getFirestore,
+            collection,
+            doc,
+            addDoc,
+            getDoc,
+            getDocs,
+            setDoc,
+            updateDoc,
+            deleteDoc,
+            query,
+            where,
+            orderBy,
+            serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+
+        /* =========================================
+           FIREBASE CONFIGURATION
+        ========================================= */
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD7ibI2I7ePqMBQSS7O6T2dty8kpTfuHcg",
+            authDomain: "blopity-blog.firebaseapp.com",
+            projectId: "blopity-blog",
+            storageBucket: "blopity-blog.firebasestorage.app",
+            messagingSenderId: "378384325490",
+            appId: "1:378384325490:web:d86ff179913ac035851beb"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+
+        /* =========================================
+           STATE
+        ========================================= */
+
+        let currentUser = null;
+        let posts = [];
+        let savedIds = new Set();
+        let currentView = "feed";
+        let editingId = null;
+        let authMode = "login";
+
+
+        /* =========================================
+           ELEMENTS
+        ========================================= */
+
+        const $ = id => document.getElementById(id);
+
+        const status = $("status");
+
+        function showStatus(message, error = false) {
+            status.textContent = message;
+            status.className = "status" + (error ? " error" : "");
+        }
+
+        function clearStatus() {
+            showStatus("");
+        }
+
+
+        /* =========================================
+           VIEW NAVIGATION
+        ========================================= */
+
+        const views = [
+            "feed",
+            "my-posts",
+            "saved",
+            "write",
+            "article",
+            "auth"
+        ];
+
+        function showView(view) {
+            currentView = view;
+
+            for (const name of views) {
+                $(name + "-view").classList.toggle(
+                    "hidden",
+                    name !== view
+                );
+            }
+
+            document.querySelectorAll(".nav-item").forEach(button => {
+                button.classList.toggle(
+                    "active",
+                    button.dataset.view === view
+                );
+            });
+
+            clearStatus();
+
+            if (view === "feed") renderFeed();
+            if (view === "my-posts") renderMyPosts();
+            if (view === "saved") renderSaved();
+
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        document.querySelectorAll("[data-view]").forEach(button => {
+            button.addEventListener("click", () => {
+                if (button.dataset.view === "write") {
+                    openEditor();
+                } else {
+                    showView(button.dataset.view);
+                }
+            });
+        });
+
+        $("home-link").addEventListener("click", event => {
+            event.preventDefault();
+            showView("feed");
+        });
+
+        $("write-button").addEventListener("click", () => openEditor());
+        $("new-post-button").addEventListener("click", () => openEditor());
+        $("cancel-button").addEventListener("click", () => showView("my-posts"));
+        $("back-button").addEventListener("click", () => showView("feed"));
+
+
+        /* =========================================
+           AUTHENTICATION
+        ========================================= */
+
+        function updateAuthUI() {
+            $("user-label").textContent =
+                currentUser ? currentUser.displayName || currentUser.email : "";
+
+            $("auth-button").textContent =
+                currentUser ? "Sign out" : "Sign in";
+        }
+
+        $("auth-button").addEventListener("click", async () => {
+            if (currentUser) {
+                await signOut(auth);
+                showView("feed");
+            } else {
+                authMode = "login";
+                updateAuthMode();
+                showView("auth");
+            }
+        });
+
+        $("toggle-auth").addEventListener("click", () => {
+            authMode = authMode === "login" ? "signup" : "login";
+            updateAuthMode();
+        });
+
+        function updateAuthMode() {
+            const signup = authMode === "signup";
+
+            $("auth-heading").textContent =
+                signup ? "Create your account" : "Welcome back";
+
+            $("auth-submit").textContent =
+                signup ? "Create account" : "Sign in";
+
+            $("toggle-auth").textContent =
+                signup ? "I already have an account" : "Create account";
+
+            $("name-group").classList.toggle("hidden", !signup);
+
+            $("password").autocomplete =
+                signup ? "new-password" : "current-password";
+        }
+
+        $("auth-form").addEventListener("submit", async event => {
+            event.preventDefault();
+            clearStatus();
+
+            const email = $("email").value.trim();
+            const password = $("password").value;
+            const name = $("display-name").value.trim();
+
+            try {
+                if (authMode === "signup") {
+                    if (!name) throw new Error("Please enter a display name.");
+
+                    const result = await createUserWithEmailAndPassword(
+                        auth, email, password
+                    );
+
+                    await updateProfile(result.user, {
+                        displayName: name
+                    });
+
+                    await setDoc(doc(db, "users", result.user.uid), {
+                        displayName: name,
+                        createdAt: serverTimestamp()
+                    });
+
+                } else {
+                    await signInWithEmailAndPassword(auth, email, password);
+                }
+
+                showView("feed");
+
+            } catch (error) {
+                showStatus(error.message, true);
+            }
+        });
+
+
+        /* =========================================
+           LOAD DATA
+        ========================================= */
+
+        async function loadPosts() {
+            try {
+                const snapshot = await getDocs(
+                    query(
+                        collection(db, "posts"),
+                        where("published", "==", true),
+                        orderBy("createdAt", "desc")
+                    )
+                );
+
+                const published = snapshot.docs.map(item => ({
+                    id: item.id,
+                    ...item.data()
+                }));
+
+                let own = [];
+
+                if (currentUser) {
+                    const ownSnapshot = await getDocs(
+                        query(
+                            collection(db, "posts"),
+                            where("authorId", "==", currentUser.uid)
+                        )
+                    );
+
+                    own = ownSnapshot.docs.map(item => ({
+                        id: item.id,
+                        ...item.data()
+                    }));
+                }
+
+                const map = new Map();
+
+                [...published, ...own].forEach(post => {
+                    map.set(post.id, post);
+                });
+
+                posts = [...map.values()];
+
+                await loadSaved();
+                renderCurrentView();
+
+            } catch (error) {
+                showStatus(
+                    "Couldn't load posts: " + error.message,
+                    true
+                );
+            }
+        }
+
+        async function loadSaved() {
+            savedIds = new Set();
+
+            if (!currentUser) return;
+
+            const snapshot = await getDocs(
+                collection(db, "users", currentUser.uid, "saved")
+            );
+
+            snapshot.forEach(item => savedIds.add(item.id));
+        }
+
+        function renderCurrentView() {
+            if (currentView === "feed") renderFeed();
+            if (currentView === "my-posts") renderMyPosts();
+            if (currentView === "saved") renderSaved();
+        }
+
+
+        /* =========================================
+           SAFE HTML
+        ========================================= */
+
+        function escapeHTML(value = "") {
+            return String(value)
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+        }
+
+        function formatDate(timestamp) {
+            if (!timestamp) return "Just now";
+
+            const date = timestamp.toDate
+                ? timestamp.toDate()
+                : new Date(timestamp);
+
+            return date.toLocaleDateString(undefined, {
+                year: "numeric",
+                month: "short",
+                day: "numeric"
+            });
+        }
+
+        function authorName(post) {
+            return post.authorName || "Anonymous";
+        }
+
+
+        /* =========================================
+           POST CARDS
+        ========================================= */
+
+        function postCard(post, owner = false) {
+            const tags = (post.tags || [])
+                .map(tag => `<span class="tag">${escapeHTML(tag)}</span>`)
+                .join(" ");
+
+            return `
+        <article class="post-card">
+            <div class="post-meta">
+                <span>${escapeHTML(authorName(post))}</span>
+                <span>·</span>
+                <span>${formatDate(post.createdAt)}</span>
+                ${owner && !post.published
+                    ? '<span class="tag">Draft</span>'
+                    : ''}
+            </div>
+
+            <h2 class="post-title">
+                <a href="#" data-open="${post.id}">
+                    ${escapeHTML(post.title)}
+                </a>
+            </h2>
+
+            <p class="post-excerpt">
+                ${escapeHTML(post.excerpt || "")}
+            </p>
+
+            <div style="margin-top:12px">${tags}</div>
+
+            <div class="editor-actions">
+                <button class="btn" data-open="${post.id}">
+                    Read
+                </button>
+
+                ${owner ? `
+                    <button class="btn" data-edit="${post.id}">
+                        Edit
+                    </button>
+                    <button class="btn" data-delete="${post.id}">
+                        Delete
+                    </button>
+                ` : ''}
+            </div>
+        </article>
+    `;
+        }
+
+        function renderList(container, list, owner = false) {
+            if (!list.length) {
+                container.innerHTML = `
+            <div class="empty">
+                <h3>Nothing here yet</h3>
+                <p>When there are posts to show, they'll appear here.</p>
+            </div>
+        `;
+                return;
+            }
+
+            container.innerHTML = list
+                .map(post => postCard(post, owner))
+                .join("");
+
+            container.querySelectorAll("[data-open]").forEach(button => {
+                button.addEventListener("click", event => {
+                    event.preventDefault();
+                    openArticle(button.dataset.open);
+                });
+            });
+
+            container.querySelectorAll("[data-edit]").forEach(button => {
+                button.addEventListener("click", () => {
+                    openEditor(button.dataset.edit);
+                });
+            });
+
+            container.querySelectorAll("[data-delete]").forEach(button => {
+                button.addEventListener("click", () => {
+                    deletePost(button.dataset.delete);
+                });
+            });
+        }
+
+
+        /* =========================================
+           FEEDS
+        ========================================= */
+
+        function renderFeed() {
+            const search = $("search-input").value
+                .trim()
+                .toLowerCase();
+
+            const publishedPosts = posts.filter(post => post.published);
+            const list = publishedPosts
+                .filter(post => {
+                    const searchable = [
+                        post.title,
+                        post.excerpt,
+                        post.body,
+                        authorName(post),
+                        ...(post.tags || [])
+                    ].join(" ").toLowerCase();
+
+                    return searchable.includes(search);
+                })
+                .sort((a, b) => {
+                    const at = a.createdAt?.toMillis?.() || 0;
+                    const bt = b.createdAt?.toMillis?.() || 0;
+                    return bt - at;
+                });
+
+            if (!list.length && !publishedPosts.length && !search) {
+                $("feed-list").innerHTML = `
+                    <div class="empty">
+                        <h3>Be the first to publish</h3>
+                        <p>Sign in or create an account to share your first post.</p>
+                        <button class="btn btn-primary" id="first-post-button" type="button">
+                            Write the first post
+                        </button>
+                    </div>
+                `;
+                $("first-post-button").addEventListener("click", () => openEditor());
+                return;
+            }
+
+            renderList($("feed-list"), list);
+        }
+
+        function renderMyPosts() {
+            if (!currentUser) {
+                $("my-post-list").innerHTML = `
+            <div class="empty">
+                <p>Sign in to manage your posts.</p>
+                <button class="btn btn-primary" id="signin-inline">
+                    Sign in
+                </button>
+            </div>
+        `;
+
+                $("signin-inline").addEventListener("click", () => {
+                    authMode = "login";
+                    updateAuthMode();
+                    showView("auth");
+                });
+
+                return;
+            }
+
+            const list = posts
+                .filter(post => post.authorId === currentUser.uid)
+                .sort((a, b) => {
+                    const at = a.createdAt?.toMillis?.() || 0;
+                    const bt = b.createdAt?.toMillis?.() || 0;
+                    return bt - at;
+                });
+
+            renderList($("my-post-list"), list, true);
+        }
+
+        function renderSaved() {
+            if (!currentUser) {
+                $("saved-list").innerHTML = `
+            <div class="empty">
+                <p>Sign in to save articles.</p>
+            </div>
+        `;
+                return;
+            }
+
+            const list = posts.filter(post =>
+                savedIds.has(post.id) && post.published
+            );
+
+            renderList($("saved-list"), list);
+        }
+
+        $("search-input").addEventListener("input", renderFeed);
+
+
+        /* =========================================
+           ARTICLE VIEW
+        ========================================= */
+
+        function openArticle(id) {
+            const post = posts.find(item => item.id === id);
+
+            if (!post) return;
+
+            const owner =
+                currentUser &&
+                currentUser.uid === post.authorId;
+
+            if (!post.published && !owner) {
+                showStatus("This article is not available.", true);
+                return;
+            }
+
+            $("article-content").innerHTML = `
+        <div class="post-meta">
+            <span>${escapeHTML(authorName(post))}</span>
+            <span>·</span>
+            <span>${formatDate(post.createdAt)}</span>
+        </div>
+
+        <h1 class="article-title">
+            ${escapeHTML(post.title)}
+        </h1>
+
+        <p class="article-excerpt">
+            ${escapeHTML(post.excerpt || "")}
+        </p>
+
+        <div>${(post.tags || []).map(tag =>
+                `<span class="tag">${escapeHTML(tag)}</span>`
+            ).join(" ")}</div>
+
+        <div class="article-body">
+            ${escapeHTML(post.body || "")}
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="editor-actions">
+            ${currentUser && !owner ? `
+                <button class="btn" id="save-article">
+                    ${savedIds.has(id) ? "★ Saved" : "☆ Save article"}
+                </button>
+            ` : ''}
+
+            ${owner ? `
+                <button class="btn" id="edit-article">Edit</button>
+            ` : ''}
+        </div>
+    `;
+
+            if (owner) {
+                $("edit-article").addEventListener("click", () => {
+                    openEditor(id);
+                });
+            }
+
+            if (currentUser && !owner) {
+                $("save-article").addEventListener("click", () => {
+                    toggleSaved(id);
+                });
+            }
+
+            showView("article");
+        }
+
+
+        /* =========================================
+           SAVE / UNSAVE
+        ========================================= */
+
+        async function toggleSaved(id) {
+            if (!currentUser) {
+                authMode = "login";
+                updateAuthMode();
+                showView("auth");
+                return;
+            }
+
+            const ref = doc(
+                db,
+                "users",
+                currentUser.uid,
+                "saved",
+                id
+            );
+
+            try {
+                if (savedIds.has(id)) {
+                    await deleteDoc(ref);
+                    savedIds.delete(id);
+                } else {
+                    await setDoc(ref, {
+                        savedAt: serverTimestamp()
+                    });
+                    savedIds.add(id);
+                }
+
+                openArticle(id);
+
+            } catch (error) {
+                showStatus(error.message, true);
+            }
+        }
+
+
+        /* =========================================
+           EDITOR
+        ========================================= */
+
+        function openEditor(id = null) {
+            if (!currentUser) {
+                authMode = "login";
+                updateAuthMode();
+                showView("auth");
+                showStatus("Sign in before writing a post.");
+                return;
+            }
+
+            editingId = id;
+
+            const post = id
+                ? posts.find(item => item.id === id)
+                : null;
+
+            if (id && (!post || post.authorId !== currentUser.uid)) {
+                showStatus("You can only edit your own posts.", true);
+                return;
+            }
+
+            $("editor-heading").textContent =
+                post ? "Edit post" : "Write a post";
+
+            $("post-title").value = post?.title || "";
+            $("post-excerpt").value = post?.excerpt || "";
+            $("post-tags").value = (post?.tags || []).join(", ");
+            $("post-body").value = post?.body || "";
+
+            $("publish-button").textContent =
+                post?.published ? "Update post" : "Publish";
+
+            showView("write");
+        }
+
+        function getEditorData(published) {
+            return {
+                title: $("post-title").value.trim(),
+                excerpt: $("post-excerpt").value.trim(),
+                body: $("post-body").value.trim(),
+                tags: $("post-tags").value
+                    .split(",")
+                    .map(tag => tag.trim().toLowerCase())
+                    .filter(Boolean)
+                    .slice(0, 10),
+                published
+            };
+        }
+
+        async function savePost(published) {
+            if (!currentUser) {
+                showStatus("Sign in to save posts.", true);
+                return;
+            }
+
+            const data = getEditorData(published);
+
+            if (!data.title || !data.body) {
+                showStatus("Please enter a title and article.", true);
+                return;
+            }
+
+            const now = serverTimestamp();
+
+            try {
+                if (editingId) {
+                    const existing = posts.find(
+                        post => post.id === editingId
+                    );
+
+                    if (!existing || existing.authorId !== currentUser.uid) {
+                        throw new Error("You cannot edit this post.");
+                    }
+
+                    await updateDoc(doc(db, "posts", editingId), {
+                        ...data,
+                        updatedAt: now
+                    });
+
+                } else {
+                    const ref = await addDoc(collection(db, "posts"), {
+                        ...data,
+                        authorId: currentUser.uid,
+                        authorName: currentUser.displayName || "Anonymous",
+                        createdAt: now,
+                        updatedAt: now
+                    });
+
+                    editingId = ref.id;
+                }
+
+                showStatus(
+                    published ? "Post published!" : "Draft saved!"
+                );
+
+                await loadPosts();
+                showView("my-posts");
+
+            } catch (error) {
+                showStatus("Couldn't save: " + error.message, true);
+            }
+        }
+
+        $("editor-form").addEventListener("submit", async event => {
+            event.preventDefault();
+            await savePost(true);
+        });
+
+        $("draft-button").addEventListener("click", async () => {
+            await savePost(false);
+        });
+
+
+        /* =========================================
+           DELETE
+        ========================================= */
+
+        async function deletePost(id) {
+            const post = posts.find(item => item.id === id);
+
+            if (!post || post.authorId !== currentUser?.uid) {
+                showStatus("You can only delete your own posts.", true);
+                return;
+            }
+
+            if (!confirm("Delete this post permanently?")) return;
+
+            try {
+                await deleteDoc(doc(db, "posts", id));
+                await loadPosts();
+                showStatus("Post deleted.");
+            } catch (error) {
+                showStatus(error.message, true);
+            }
+        }
+
+
+        /* =========================================
+           AUTH STATE
+        ========================================= */
+
+        onAuthStateChanged(auth, async user => {
+            currentUser = user;
+
+            updateAuthUI();
+
+            await loadPosts();
+
+            if (!user && currentView === "my-posts") {
+                renderMyPosts();
+            }
+        });
+
+    </script>
+</body>
+
+</html>
